@@ -1,3 +1,4 @@
+# coding=utf-8
 import numpy
 
 def creerGraphe(str):
@@ -61,41 +62,63 @@ def lireGraphe(graph):
 
         for destinationVertex, distance in sorted(destination.iteritems()):
             neighbors = neighbors + "(" + str(destinationVertex) + ", " + str(distance) + "mins),"
-predecessors = {}
+
         neighbors = neighbors[:-1]
         neighbors = neighbors + ")"
         print(neighbors)
 
 
-def dijkstra(adjacenceList, start, end, Visited = [], distances = {}, predecessors = {}):
+def dijkstra(adjacenceList, start, end, visited = [], distances = {}, predecessors = {}):
 
 
     if start not in adjacenceList:
-        raise TypeError("Le point de départ n'est pas présent pas dans la carte")
+        raise TypeError("Le point de départ n\'est pas présent pas dans la carte")
     if end not in adjacenceList:
-        raise  TypeError("Le point d'arrivée n'est pas présent dans la carte")
+        raise TypeError("Le point d\'arrivée n\'est pas présent dans la carte")
 
     #Initialise les coûts (infini pour les
     #sommets non visités
     for vertex in adjacenceList:
         if vertex != start:
             distances[vertex] = float('inf')
-            predecessors[vertex] = Null
-            notVisited.append(vertex)
+            predecessors[vertex] = None
 
     distances[start] = 0
 
-        min(vertex for vertex in distances if vertex not in visited, key= distances.get())
+    while( len(visited) is not len(adjacenceList)):
 
-            distances[start] = 0
+        #Cherche le sommet non visité avec une distance totale (start --> sommet) minimale
+        smallestVertex = min((vertex for vertex in distances if vertex not in visited), key = distances.get)
 
-        for voisin in adjacenceList.items():
-            newDistance = distances[]
+        if smallestVertex == end:
+            return (distances, predecessors)
 
-    #Condition finale si on a trouvé le chemin jusqu'a end
-    #On construit le chemin le plus court
-    if start == end:
+        visited.append(smallestVertex)
+
+        for voisin, distanceToVoisin in adjacenceList[smallestVertex].items():
+            if voisin not in visited:
+                newDistance = distances[smallestVertex] + distanceToVoisin
+                if newDistance < distances[voisin]:
+                    distances[voisin] = newDistance
+                    predecessors[voisin] = smallestVertex
+
+
 
 weights,chargingStations = creerGraphe("arrondissements.txt")
-lireGraphe(weights)
+#lireGraphe(weights)
+
+start = 2
+end = 6
+shortest = dijkstra(weights,start,end)
+
+path = []
+vertex = end
+
+while vertex != start:
+    path.append(vertex)
+    vertex = shortest[1][vertex]
+
+path.append(start)
+
+print(list(reversed(path)))
 
