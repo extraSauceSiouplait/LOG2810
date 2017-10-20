@@ -1,66 +1,124 @@
+# coding=utf-8
 import numpy
 
+def creerGraphe(str):
 
-def createGraph(str):
     data = open("./" + str, "r")
-    chargingStations = []
-    weights = []
+    chargingStationsDict = {}
+    weightsDict = {}
+
 
     for line in data:
-        temp = line.strip('\n').split(",")
+        temp = line.strip('\n').strip('\r').split(",")
 
         if len(temp) == 2:
-            temp = [int(x) for x in temp]
-            chargingStations.append(temp)
+            for i in range(len(temp)):
+                temp[i] = int(temp[i])
+
+            chargingStationsDict[temp[0]] = temp[1]
 
         elif len(temp) == 3:
-            temp = [int(x) for x in temp]
-            weights.append(temp)
+            for i in range(len(temp)):
+                temp[i] = int(temp[i])
 
-    weightsGraph = numpy.zeros(shape=(len(chargingStations), len(chargingStations)))
+            if (not weightsDict.has_key(temp[0])):
+                weightsDict[temp[0]] = {}
+            weightsDict[temp[0]][temp[1]] = temp[2]
 
-    for arc in weights:
-        weightsGraph[arc[0] - 1, arc[1] - 1] = arc[2]
-        weightsGraph[arc[1] - 1, arc[0] - 1] = arc[2]
+            if (not weightsDict.has_key(temp[1])):
+                weightsDict[temp[1]] = {}
+            weightsDict[temp[1]][temp[0]] = temp[2]
 
-    return (weightsGraph, chargingStations)
-
+    return (weightsDict,chargingStationsDict)
 
 def convertPointToCity(p):
-    if (p > 19 or p < 1):
+    if(p>19 or p<1):
         return "not in MTL"
     cityNames = ["Ahuntsic-Cartierville",
-                 "Anjou",
-                 "Cote-des-Neiges-Notre-Dame-de-Grace",
-                 "Lachine",
-                 "LaSalle",
-                 "Le Plateau Mont-Royal",
-                 "Le Sud-Ouest",
-                 "L'Ile-Bizard-Sainte-Genevieve",
-                 "Mercier-Hochelaga-Maisonneuve",
-                 "Montreal-Nord",
-                 "Outremont",
-                 "Pierrefonds-Roxboro",
-                 "Riviere-des-Prairies-Pointe-aux-Trembles",
-                 "Rosemont-La-Petite-Patrie",
-                 "Saint-Laurent",
-                 "Saint-Leonard",
-                 "Verdun",
-                 "Ville-Marie",
-                 "Villeray-Saint-Michel-Parc-Extension"]
-    return cityNames[p - 1]
+                "Anjou",
+                "Cote-des-Neiges-Notre-Dame-de-Grace",
+                "Lachine",
+                "LaSalle",
+                "Le Plateau Mont-Royal",
+                "Le Sud-Ouest",
+                "L'Ile-Bizard-Sainte-Genevieve",
+                "Mercier-Hochelaga-Maisonneuve",
+                "Montreal-Nord",
+                "Outremont",
+                "Pierrefonds-Roxboro",
+                "Riviere-des-Prairies-Pointe-aux-Trembles",
+                "Rosemont-La-Petite-Patrie",
+                "Saint-Laurent",
+                "Saint-Leonard",
+                "Verdun",
+                "Ville-Marie",
+                "Villeray-Saint-Michel-Parc-Extension"]
+    return cityNames[int(p)-1]
 
+def lireGraphe(graph):
+    for startingVertex, destination in sorted(graph.iteritems()):
 
-def displayGraph(graph):
-    for j in range(graph.shape[0]):
-        neighbors = "(" + str(convertPointToCity(j + 1)) + ", " + str(j + 1) + ", ("
-        for i in range(graph.shape[0]):
-            if (graph[j, i] != 0):
-                neighbors = neighbors + "(" + str(convertPointToCity(i + 1)) + ", " + str(graph[j, i]) + "min)"
+        neighbors = "(" + str(startingVertex) + ", " + str(startingVertex) + ", ("
+
+        for destinationVertex, distance in sorted(destination.iteritems()):
+            neighbors = neighbors + "(" + str(destinationVertex) + ", " + str(distance) + "mins),"
+
+        neighbors = neighbors[:-1]
         neighbors = neighbors + ")"
         print(neighbors)
-    print("done")
 
 
-g = createGraph("arrondissements.txt")
-displayGraph(g[0])
+def dijkstra(adjacenceList, start, end, visited = [], distances = {}, predecessors = {}):
+
+
+    if start not in adjacenceList:
+        raise TypeError("Le point de départ n\'est pas présent pas dans la carte")
+    if end not in adjacenceList:
+        raise TypeError("Le point d\'arrivée n\'est pas présent dans la carte")
+
+    #Initialise les coûts (infini pour les
+    #sommets non visités
+    for vertex in adjacenceList:
+        if vertex != start:
+            distances[vertex] = float('inf')
+            predecessors[vertex] = None
+
+    distances[start] = 0
+
+    while( len(visited) is not len(adjacenceList)):
+
+        #Cherche le sommet non visité avec une distance totale (start --> sommet) minimale
+        smallestVertex = min((vertex for vertex in distances if vertex not in visited), key = distances.get)
+
+        if smallestVertex == end:
+            return (distances, predecessors)
+
+        visited.append(smallestVertex)
+
+        for voisin, distanceToVoisin in adjacenceList[smallestVertex].items():
+            if voisin not in visited:
+                newDistance = distances[smallestVertex] + distanceToVoisin
+                if newDistance < distances[voisin]:
+                    distances[voisin] = newDistance
+                    predecessors[voisin] = smallestVertex
+
+
+
+weights,chargingStations = creerGraphe("arrondissements.txt")
+#lireGraphe(weights)
+
+start = 2
+end = 6
+shortest = dijkstra(weights,start,end)
+
+path = []
+vertex = end
+
+while vertex != start:
+    path.append(vertex)
+    vertex = shortest[1][vertex]
+
+path.append(start)
+
+print(list(reversed(path)))
+
