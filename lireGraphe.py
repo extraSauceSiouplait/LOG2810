@@ -3,7 +3,12 @@ import numpy
 
 def creerGraphe(str):
 
-    data = open("./" + str, "r")
+    try:
+        data = open("./" + str, "r")
+
+    except IOError:
+        print("Erreur lors de la lecture du fichier: " + str + " . Assurez-vous que celui-ci soit placé à la racine et qu'il ait le bon nom")
+
     chargingStationsDict = {}
     weightsDict = {}
 
@@ -11,15 +16,17 @@ def creerGraphe(str):
     for line in data:
         temp = line.strip('\n').strip('\r').split(",")
 
-        if len(temp) == 2:
+        if temp.isnumeric():
             for i in range(len(temp)):
                 temp[i] = int(temp[i])
-
+                if temp[i] <= 0:
+                    raise TypeError("Entier négatif trouvé dans les données de: " + str + " . Assurez vous que celles-ci soit de format:"
+                        "x,y,z où les deux premières valeurs sont des ENTIERS POSITIFS et la dernière un RÉEL POSITIF. Ils représentent dans l'ordre, le quartier de départ,"
+                        "celui d'arrivée et la distance (en min) entre ceux-ci")
+        if len(temp) == 2:
             chargingStationsDict[temp[0]] = temp[1]
 
         elif len(temp) == 3:
-            for i in range(len(temp)):
-                temp[i] = int(temp[i])
 
             if (not weightsDict.has_key(temp[0])):
                 weightsDict[temp[0]] = {}
@@ -28,6 +35,15 @@ def creerGraphe(str):
             if (not weightsDict.has_key(temp[1])):
                 weightsDict[temp[1]] = {}
             weightsDict[temp[1]][temp[0]] = temp[2]
+
+    if len(weightsDict) == 0:
+        raise TypeError("Aucune donnée de quartiers lues dans le fichier: " + str + " Assurez vous que celles-ci soit de format:"
+                        "x,y,z où les deux premières valeurs sont des ENTIERS POSITIFS et la dernière un RÉEL POSITIF. Ils représentent dans l'ordre, le quartier de départ,"
+                        "celui d'arrivée et la distance (en min) entre ceux-ci")
+
+    if len(chargingStationsDict) == 0:
+        raise TypeError("Aucune station de recharge détectée, la lecture des données de la carte semble toutefois correcte.")
+
 
     return (weightsDict,chargingStationsDict)
 
@@ -55,7 +71,8 @@ def convertPointToCity(p):
                 "Villeray-Saint-Michel-Parc-Extension"]
     return cityNames[int(p)-1]
 
-def lireGraphe(graph):
+def printGraphe(graph):
+
     for startingVertex, destination in sorted(graph.iteritems()):
 
         neighbors = "(" + str(startingVertex) + ", " + str(startingVertex) + ", ("
@@ -68,8 +85,11 @@ def lireGraphe(graph):
         print(neighbors)
 
 
-def dijkstra(adjacenceList, start, end, visited = [], distances = {}, predecessors = {}):
+def dijkstra(adjacenceList, start, end):
 
+    visited = []
+    distances = {}
+    predecessors = {}
 
     if start not in adjacenceList:
         raise TypeError("Le point de départ n\'est pas présent pas dans la carte")
@@ -104,21 +124,25 @@ def dijkstra(adjacenceList, start, end, visited = [], distances = {}, predecesso
 
 
 
+def printPath(graph, start, end):
+
+
+    shortest = dijkstra(graph,start,end)
+
+    path = []
+    vertex = end
+
+    while vertex != start:
+        path.append(vertex)
+        vertex = shortest[1][vertex]
+
+    path.append(start)
+
+    print(list(reversed(path)))
+
+
+printPath(weights, 1, 3)
+printPath(weights, 1, 3)
+
 weights,chargingStations = creerGraphe("arrondissements.txt")
 #lireGraphe(weights)
-
-start = 2
-end = 6
-shortest = dijkstra(weights,start,end)
-
-path = []
-vertex = end
-
-while vertex != start:
-    path.append(vertex)
-    vertex = shortest[1][vertex]
-
-path.append(start)
-
-print(list(reversed(path)))
-
