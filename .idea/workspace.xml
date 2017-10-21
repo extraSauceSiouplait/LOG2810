@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2105310-81bd-4eaf-847b-5353d74a80c1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/LOG2810.iml" afterPath="$PROJECT_DIR$/.idea/LOG2810.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lireGraphe.py" afterPath="$PROJECT_DIR$/lireGraphe.py" />
     </list>
@@ -28,8 +25,8 @@
       <file leaf-file-name="lireGraphe.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lireGraphe.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1110">
-              <caret line="113" column="17" lean-forward="false" selection-start-line="113" selection-start-column="17" selection-end-line="113" selection-end-column="17" />
+            <state relative-caret-position="2715">
+              <caret line="181" column="0" lean-forward="true" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -47,7 +44,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="5">
+  <component name="ProjectFrameBounds" extendedState="4">
     <option name="width" value="1916" />
     <option name="height" value="1173" />
   </component>
@@ -288,9 +285,10 @@
     <configuration />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1916" height="1173" extended-state="5" />
+    <frame x="0" y="0" width="1916" height="1173" extended-state="4" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.059358288" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.059358288" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286908" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -320,23 +318,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/lireGraphe.py</url>
-          <line>143</line>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/lireGraphe.py</url>
-          <line>144</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/lireGraphe.py</url>
-          <line>140</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-      </breakpoints>
       <option name="time" value="35" />
     </breakpoint-manager>
     <watches-manager />
@@ -362,6 +343,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="14085">
           <caret line="939" column="0" lean-forward="false" selection-start-line="939" selection-start-column="0" selection-end-line="939" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -377,6 +359,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="14085">
           <caret line="939" column="0" lean-forward="false" selection-start-line="939" selection-start-column="0" selection-end-line="939" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -392,20 +375,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="14085">
           <caret line="939" column="0" lean-forward="false" selection-start-line="939" selection-start-column="0" selection-end-line="939" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13530">
-          <caret line="939" column="0" lean-forward="false" selection-start-line="939" selection-start-column="0" selection-end-line="939" selection-end-column="0" />
+        <state relative-caret-position="148">
+          <caret line="881" column="31" lean-forward="false" selection-start-line="881" selection-start-column="31" selection-end-line="881" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lireGraphe.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1110">
-          <caret line="113" column="17" lean-forward="false" selection-start-line="113" selection-start-column="17" selection-end-line="113" selection-end-column="17" />
+        <state relative-caret-position="2715">
+          <caret line="181" column="0" lean-forward="true" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
           <folding />
         </state>
       </provider>

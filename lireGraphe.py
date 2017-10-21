@@ -1,6 +1,18 @@
 # coding=utf-8
 import numpy
 
+
+## @package Utils.GraphInterpretation
+#   Ensemble des fonctions utilitaires qui creent le graphe de la ville et
+#   calculent le plus court chemin entre deux points
+
+## creerGraphe
+#  Extrait d'un fichier texte: les donnes des stations de recharges et celles des quartier de la ville et de la distance entre eux.
+#
+#  @param str le nom du fichier a lire.
+#
+#  @return Un tuple contenant la liste d'adjacence du graphe (un dictionnaire) et un dictionnaire des stations de recharge
+#
 def creerGraphe(str):
 
     try:
@@ -47,6 +59,14 @@ def creerGraphe(str):
 
     return (weightsDict,chargingStationsDict)
 
+
+## convertPointToCity
+#  Converti le nombre representant un quartier en son nom complet.
+#
+#  @param p L'entier positif representant le quartier a interpreter
+#
+#  @return Un string contenant le nom du quartier
+#
 def convertPointToCity(p):
     if(p>19 or p<1):
         return "not in MTL"
@@ -71,6 +91,12 @@ def convertPointToCity(p):
                 "Villeray-Saint-Michel-Parc-Extension"]
     return cityNames[int(p)-1]
 
+
+## printGraphe
+#  Imprime dans STDOUT la representation d'un graphe
+#
+#  @param graph La liste d'adjacence a imprimer
+#
 def printGraphe(graph):
 
     for startingVertex, destination in sorted(graph.iteritems()):
@@ -84,7 +110,15 @@ def printGraphe(graph):
         neighbors = neighbors + ")"
         print(neighbors)
 
-
+## dijkstra
+#  Calcule le plus court chemin entre 2 points d'un graphe A MODIFIER!!!
+#
+#  @param adjacenceList La liste d'adjacence d'ou tirer les donnees
+#  @param start Le point de depart du chemin
+#  @param end Le point d'arrivee du chemin
+#
+#  @return A MODIFIER!!
+#
 def dijkstra(adjacenceList, start, end):
 
     visited = []
@@ -123,8 +157,14 @@ def dijkstra(adjacenceList, start, end):
                     predecessors[voisin] = smallestVertex
 
 
-
-def printPath(graph, start, end):
+## printPath
+#  Imprime dans STDOUT le plus court chemin entre deux point d'un graphe
+#
+#  @param graph La liste d'adjacence d'ou tirer les donnees
+#  @param start Le point de depart du chemin
+#  @param end Le point d'arrivee du chemin
+#
+def printShortestPath(graph, start, end):
 
 
     shortest = dijkstra(graph,start,end)
@@ -139,10 +179,3 @@ def printPath(graph, start, end):
     path.append(start)
 
     print(list(reversed(path)))
-
-
-printPath(weights, 1, 3)
-printPath(weights, 1, 3)
-
-weights,chargingStations = creerGraphe("arrondissements.txt")
-#lireGraphe(weights)
