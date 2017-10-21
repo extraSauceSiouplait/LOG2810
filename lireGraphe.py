@@ -4,7 +4,21 @@ import numpy
 
 ## @package Utils.GraphInterpretation
 #   Ensemble des fonctions utilitaires qui creent le graphe de la ville et
-#   calculent le plus court chemin entre deux points
+#   calculent le plus court chemin entre deux points.
+
+## isNumeric
+#  Verifie si une liste donnee ne contient que des nombres.
+#
+#  @param list La liste
+#
+#  @return Un booléen indiquant la réponse
+def isNumeric(list):
+    for elem in list:
+        if not elem.isdigit():
+            return False
+        else:
+            return True
+
 
 ## creerGraphe
 #  Extrait d'un fichier texte: les donnes des stations de recharges et celles des quartier de la ville et de la distance entre eux.
@@ -28,25 +42,26 @@ def creerGraphe(str):
     for line in data:
         temp = line.strip('\n').strip('\r').split(",")
 
-        if temp.isnumeric():
+        if isNumeric(temp):
             for i in range(len(temp)):
                 temp[i] = int(temp[i])
-                if temp[i] <= 0:
+                if temp[i] < 0:
                     raise TypeError("Entier négatif trouvé dans les données de: " + str + " . Assurez vous que celles-ci soit de format:"
                         "x,y,z où les deux premières valeurs sont des ENTIERS POSITIFS et la dernière un RÉEL POSITIF. Ils représentent dans l'ordre, le quartier de départ,"
                         "celui d'arrivée et la distance (en min) entre ceux-ci")
-        if len(temp) == 2:
-            chargingStationsDict[temp[0]] = temp[1]
 
-        elif len(temp) == 3:
+            if len(temp) == 2:
+                chargingStationsDict[temp[0]] = temp[1]
 
-            if (not weightsDict.has_key(temp[0])):
-                weightsDict[temp[0]] = {}
-            weightsDict[temp[0]][temp[1]] = temp[2]
+            elif len(temp) == 3:
 
-            if (not weightsDict.has_key(temp[1])):
-                weightsDict[temp[1]] = {}
-            weightsDict[temp[1]][temp[0]] = temp[2]
+                if (not weightsDict.has_key(temp[0])):
+                    weightsDict[temp[0]] = {}
+                weightsDict[temp[0]][temp[1]] = temp[2]
+
+                if (not weightsDict.has_key(temp[1])):
+                    weightsDict[temp[1]] = {}
+                weightsDict[temp[1]][temp[0]] = temp[2]
 
     if len(weightsDict) == 0:
         raise TypeError("Aucune donnée de quartiers lues dans le fichier: " + str + " Assurez vous que celles-ci soit de format:"
@@ -179,3 +194,7 @@ def printShortestPath(graph, start, end):
     path.append(start)
 
     print(list(reversed(path)))
+
+graphe, stations = creerGraphe("arrondissements.txt")
+
+printShortestPath(graphe, 2, 8)
