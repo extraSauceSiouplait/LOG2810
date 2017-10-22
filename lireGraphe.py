@@ -237,64 +237,15 @@ def convertDistanceAndPath(distances,predecessors,start,end):
 #				Si le trajet est possible
 #				La duree du trajet en minutes
 #				la charge qui reste dans la pile (float qui peut etre negatif dans le cas ou le trajet est impossible)
-def directRoutePossible(distanceMatrix,start,end,bigDrone,packageSize,consumption=[[10.0,20.0,40.0],[10.0,15.0,25.0]]):
+def directRoute(distanceMatrix,start,end,bigDrone,packageSize,consumption=[[10.0,20.0,40.0],[10.0,15.0,25.0]]):
     dist = distanceMatrix[start][end][0]
     c = consumption[bigDrone][packageSize]/10.0
 
     remainingCharge = 100.0 - float(dist)*c
     if remainingCharge < 20.0:
-        return (False,dist,remainingCharge)
+        return (False,dist,distanceMatrix[start][end][1])
     else:
-        return (True,dist,distanceMatrix[start][end][1],remainingCharge)
-
-
-
-#Input:		dictionnaire de dictionnaire representant les distance et les path d'un point a un autre
-#			un dictionnaire des stations de chargement
-#			debut d'un trajet
-#			arret a une station de charge
-#			fin du trajet
-#			un int 0 ou 1 representant si on regarde le trajet d'un drone 3.3A (0) ou un drone 5A (1)
-#			un int representant la grosseur du colis a livrer: small(0), medium(1), large(2)
-#Output:	Un tuple avec deux valeurs
-#				Boolean qui represente si le trajet est possible
-#				le meilleur chemin a prendre
-def computeShortestCompoundDistance(distancesMatrix,chargingStations,nStations,a,b,bigDrone,packageSize):
-    routes = []
-    for cStation in chargingStations:
-        if chargingStations[cStation] == 1:
-            print("cStation: " + str(cStation))
-            route1 = directRoutePossible(distancesMatrix,a,cStation,bigDrone,packageSize)
-            route2 = directRoutePossible(distancesMatrix,cStation,b,bigDrone,packageSize)
-            if route1[0] and route2[0]:
-                routes.append((route1,route2))
-
-    if not routes:
-        #recusively call compute shortest routes?
-        if nStations == 0:
-            print("no possible routes")
-            return False
-        else:
-            print("must dive deeper")
-            for cStations in chargingStations:
-                if chargingStations == 1:
-                    print("verifying possible routes passing though charging station " + str(cStation))
-                    route1 = computeShortestCompoundDistance(distancesMatrix,chargingStations,nStations-1,a,cStations,bigDrone,packageSize)
-                    route2 = computeShortestCompoundDistance(distancesMatrix,chargingStations,nStations-1,cStations,b,bigDrone,packageSize)
-                    #if route1[0] and route2[0]:
-                        #return
-        return False
-
-
-    print("route possible")
-    bestRoute = routes[0]
-    for route in routes:
-        if (route[0][1] + route[1][1]) < bestRoute[0][1] + bestRoute[1][1]:
-            bestRoute = route
-    print(bestRoute)
-    return (True,bestRoute[0][1]+bestRoute[1][1]+20.0,bestRoute[0][2][:-1]+bestRoute[1][2])
-    #returns (possible route , distance + 20 mins , (path a-b, path b-c)
-
+        return (True,dist,distanceMatrix[start][end][1])
 
 
 #Inputs:	dictionnaire de dictionnaires qui represente toutes les distances directes et les paths entre deux points
@@ -308,51 +259,141 @@ def computeShortestCompoundDistance(distancesMatrix,chargingStations,nStations,a
 #				Le parcours optmial
 #				L'energie qu'il reste dans la pile
 def checkForPossibleRoutes(distanceMatrix,chargingStations,start,end,packageSize):
-    route = directRoutePossible(distanceMatrix,start,end,0,packageSize)
-    if route[0]:
-        print("direct route possible")
-        print(route)
-        return route
-        #probably need to return path and total time
-    else:
-        print("no direct route possible. verifying compound route")
-        nChargingStations = sum(x == 1 for x in chargingStations.values())
-        route = computeShortestCompoundDistance(distanceMatrix,chargingStations,nChargingStations,start,end,0,packageSize)
-        if route[0]:
-            print(route)
-            return route
-        else:
-            print("no route")
-            return False
+	path = getRoute(distanceMatrix,withoutValues(chargingStations,[0]),start,end,0,packageSize)
+	if path[0]:
+		return (path,0)
+	else:
+		path = getRoute(distanceMatrix,withoutValues(chargingStations,[0]),start,end,1,packageSize)
+		if path[0]:
+			return (path,1)
+		else:
+			return (path,-1)
 
 
 
+#Inputs: les deux chemins a combiner
+#Output: un tuple avec
+#				un bool qui indique le respect des conditions
+#				le temps requis pour completer le trajet (temps route1 + temps route2 + 20)
+#				le chemin complet
+def combineRoutes(route1,route2):
+	conditionsRespected = route1[0] and route2[0]
+	if conditionsRespected:
+		timeInMins = route1[1] + route2[1] + 20
+	else:
+		timeInMins = float("inf")
+	path = route1[2] + route2[2]
+	return (conditionsRespected, timeInMins, path)
+
+
+
+#Input	distanceMatrix
+#		la liste des stations de chargement
+#		le debut du trajet
+#		la fin du trajet
+#		le modele de drone
+#		la taille du colis
+#Output	un tuple indiquant
+#			un bool qui indique si le trajet est possible avec les conditions donnees
+#			le temps requis au trajet
+#			le chemin pris (lorsqu'il y a des doublons, ca represente les arrets aux stations de chargement)
+def getRoute(distanceMatrix,chargingStations,start,end,bigDrone,packageSize):
+	path = directRoute(distanceMatrix,start,end,bigDrone,packageSize)
+	if path[0]:
+		return path
+	else:
+		routes = []
+		for c in chargingStations:
+			route1 = getRoute(distanceMatrix,withoutKeys(chargingStations,[c]),start,c,bigDrone,packageSize)
+			route2 = getRoute(distanceMatrix,withoutKeys(chargingStations,[c]),c,end,bigDrone,packageSize)
+			r = combineRoutes(route1,route2)
+			if r[0]:
+				routes.append(r)
+		if not routes:
+			return path
+		else:
+			bestRoute = (True,float("inf"),[])
+			for route in routes:
+				if route[0] and (route[1] < bestRoute[1]):
+					bestRoute = route
+			return bestRoute
+
+
+
+#Input	un dictionnaire
+#		une liste de valeurs a enlever
+#Output	une copie du dictinnaire sans les pairs qui contiennent cette valeur
+def withoutValues(dic,vals):
+	copy = {}
+	for e in dic:
+		for val in vals:
+			if dic[e] != val:
+				copy[e] = dic[e]
+	return copy
+
+
+#Input	un dictionnaire
+#		une liste de keys a enlever
+#Output	une copie du dictionnaire sans les pairs ayant ces keys
+def withoutKeys(dic,keys):
+	copy = {}
+	for e in dic:
+		for key in keys:
+			if not (e == key):
+				copy[e] = dic[e]
+	return copy
+	
+
+def afficherParcours(path,taille):
+	if path[0][2][0] == path[0][2][-1]:
+		print("Le debut et la fin fin sont au meme endroit. Une livraison n'est donc pas necessaire...")
+	elif not path[0][0]:
+		print("Il est impossible de completer securitairement cette livraison.")
+	else:
+		if taille == 0:
+			t = "petit"
+		elif taille == 1:
+			t = "moyen"
+		else:
+			t = "large"
+		print("Taille du colis: " + t)
+		print("De " + str(path[0][2][0]) + " a " + str(path[0][2][-1]))
+		print("Duree totale: " + str(path[0][1]) + " minutes")
+		print("Le trajet a suivre: ")
+		previous = path[0][2][-1]
+		trajet = str(path[0][2][0])
+		for city in path[0][2][1:]:
+			if city == previous:
+				trajet += " (arret de recharge)"
+			else:
+				trajet = trajet + " -> " + str(city)
+			previous = city
+		print(trajet)
+		if path[1] == 1:
+			print("Il serait necessaire d'utiliser le drone a 5A.")
+		else:
+			print("Il est possible d'utiliser le drone a 3.3A.")
 
 weights,chargingStations = creerGraphe("arrondissements.txt")
 #lireGraphe(weights)
 
 allDist = createDistanceMatrix(weights)
 
-point = (8,15)
-package = 2
+trip = (8,18)		#	(a,b) le trajet du point a au point b
+package = 1			#	small(0), medium(1), large(2)
 
-checkForPossibleRoutes(allDist,chargingStations,point[0],point[1],package)[0]
+afficherParcours(checkForPossibleRoutes(allDist,chargingStations,trip[0],trip[1],package),package)
+
 
 """
-point = (8,12)
-print("Distance between " + str(point[0]) + " and " + str(point[1])+ ": " + str(allDist[point[0]][point[1]][0]))
-print("path: " + str(allDist[point[0]][point[1]][1]))
-print(directRoutePossible(allDist,point[0],point[1],0,2))
-
-point = (8,17)
-print("Distance between " + str(point[0]) + " and " + str(point[1])+ ": " + str(allDist[point[0]][point[1]][0]))
-print("path: " + str(allDist[point[0]][point[1]][1]))
-print(directRoutePossible(allDist,point[0],point[1],0,2))
-
-point = (8,17)
-print("Distance between " + str(point[0]) + " and " + str(point[1])+ ": " + str(allDist[point[0]][point[1]][0]))
-print("path: " + str(allDist[point[0]][point[1]][1]))
-print(directRoutePossible(allDist,point[0],point[1],0,2))
+for start in range(1,19+1):
+	for end in range(1,19+1):
+		trip = (start,end)
+		#print("from " + str(start) + " to " + str(end))
+		for package in range(3):
+			#print("\tpackage size: "+str(package))
+			#print("\t\t" + str(checkForPossibleRoutes(allDist,chargingStations,trip[0],trip[1],package)))
+			afficherParcours(checkForPossibleRoutes(allDist,chargingStations,trip[0],trip[1],package),package)
 """
 
 
