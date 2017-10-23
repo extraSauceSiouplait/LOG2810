@@ -193,10 +193,15 @@ def printShortestPath(graph, start, end):
     print(list(reversed(path)))
 
 
-#Input: un dictionnaire de dictionnaire qui detaille les arcs et leur cout
-#Output: un dictionnaire de dictionnaires.
-#	Pour chaque paire (start,end), on obtient un int avec la distance (en minutes) et
-#	une liste du de int representant le meilleur chemin entre les deux points
+## createDistanceMatrix
+#  A partir d'une liste d'adjacence, une matrice est cree pour indiquer les distance et le trajet entre un point et un autre
+#
+#  @param un dictionnaire de dictionnaire qui detaille les arcs et leur cout
+#
+#  @return un dictionnaire de dictionnaires		
+#
+#  Pour chaque paire (start,end), on obtient un int avec la distance (en minutes) et
+#  une liste du de int representant le meilleur chemin entre les deux points
 def createDistanceMatrix(graph):
     allDistances = {}
     for start in graph:
@@ -210,11 +215,14 @@ def createDistanceMatrix(graph):
 
 
 
-#Input: un dictionnaire representant le vecteur obtenue par la fonction dijkstra
-#		un dictionnaire representant les meilleur path obtenues par la fonction dijkstra
-#		le debut du chemin
-#		la fin du chemin
-#Output:un tuple representant la distance la plus courte entre deux points (int) et le meilleur chemin (liste de int)
+## convertDistanceAndPath 
+#  Cette fonciton convertit la sortie de la fonction dijkstra en entree pour la matrice des distances. 
+#
+#  @param distances:  un dictionnaire representant le vecteur obtenue par la fonction dijkstra  
+#		  predecessors: un dictionnaire representant les meilleur path obtenues par la fonction dijkstra
+#		  start: le debut du chemin
+#		  end: la fin du chemin
+#  @return un tuple representant la distance la plus courte entre deux points (int) et le meilleur chemin (liste de int)		
 def convertDistanceAndPath(distances,predecessors,start,end):
     d = distances[end]
     path = []
@@ -228,15 +236,17 @@ def convertDistanceAndPath(distances,predecessors,start,end):
 
 
 
-#Input: un dictionnaire de dictionnaires representant les distance et les path d'un point a un autre
-#		le debut du chemin
-#		la fin du chemin
-#		un int 0 ou 1 representant si on regarde le trajet d'un drone 3.3A (0) ou un drone 5A (1)
-#		un int representant la grosseur du colis a livrer: small(0), medium(1), large(2)
-#Output:	un tuple ayant 3 valeurs:
-#				Si le trajet est possible
-#				La duree du trajet en minutes
-#				la charge qui reste dans la pile (float qui peut etre negatif dans le cas ou le trajet est impossible)
+## directRoute 
+#  Cette fonction calcule le plus court chemin entre deux points et determine si le trajet respecte les contraintes etablies. 
+#
+#  @param	distanceMarix:	un dictionnaire de dictionnaires representant les distance et les path d'un point a un autre
+#			start:			le debut du chemin
+#			end:			la fin du chemin
+#			bigDrone:		un int 0 ou 1 representant si on regarde le trajet d'un drone 3.3A (0) ou 5A (1)
+#			packageSize:	un int 0, 1 ou 2 representant la grosseur du colis (petit(0), moyen(1), gros(2))
+#			consumption:	un tableau qui donne la consommation de chaque drone
+#
+#  @return un tuple indiquant si le trajet respecte les conditions (bool), la duree du trajet en minutes (int) et le trajet optimal (une liste de int)
 def directRoute(distanceMatrix,start,end,bigDrone,packageSize,consumption=[[10.0,20.0,40.0],[10.0,15.0,25.0]]):
     dist = distanceMatrix[start][end][0]
     c = consumption[bigDrone][packageSize]/10.0
@@ -248,16 +258,20 @@ def directRoute(distanceMatrix,start,end,bigDrone,packageSize,consumption=[[10.0
         return (True,dist,distanceMatrix[start][end][1])
 
 
-#Inputs:	dictionnaire de dictionnaires qui represente toutes les distances directes et les paths entre deux points
-#			dictionnaire des stations de charge qui definit quelles arrets sont des stations de charge
-#			debut du chemin
-#			fin de chemin
-#			dimension du colis
-#Outputs:	une tuple qui indique
-#				Si le transport sera possible
-#				Le temps de transport
-#				Le parcours optmial
-#				L'energie qu'il reste dans la pile
+## checkForPossibleRoutes
+#  Cette fonction verifie s'il y a un trajet securitaire possible pour effectuer la livraison.
+#
+#  @param	distanceMatrix: la matrice des distances en entree
+#			chargingStations: un dictionnaire des stations de rechargement
+#			start: le point de depart de la livraison
+#			end: la destination de la livraison
+#			packageSize: la taille du colis a livrer (small(0), medium(1), large(2))
+#	@return	un tuple de deux elements:
+#				un tuple contenant
+#					le booleen indiquant si les conditions sot respectes
+#					le temps que prendra le trajet (int)
+#					le trajet (exprime comme une liste de int)
+#				un int qui retourne les conditions necessaires de la livraison (0: drone3.3A, 1: drone5A, -1:Trajet securitaire impossible)
 def checkForPossibleRoutes(distanceMatrix,chargingStations,start,end,packageSize):
 	path = getRoute(distanceMatrix,withoutValues(chargingStations,[0]),start,end,0,packageSize)
 	if path[0]:
@@ -271,11 +285,16 @@ def checkForPossibleRoutes(distanceMatrix,chargingStations,start,end,packageSize
 
 
 
-#Inputs: les deux chemins a combiner
-#Output: un tuple avec
-#				un bool qui indique le respect des conditions
-#				le temps requis pour completer le trajet (temps route1 + temps route2 + 20)
-#				le chemin complet
+## combineRoutes
+#  Cette fonction permet de combiner deux trajets en un seul.
+#
+#  @param deux routes (dans la forme de la sortie des fonctions getRoute et directRoute)
+#
+#  @return une seule route qui est la combinaison des deux routes
+#		la sortie indique:
+#			si les deux routes respectent les conditions
+#			le temps total que prendra cette route (temps[route1] + temps[route2] + 20minPourRechargement)
+#			le trajet a prendre (lorsqu'un point est repete dans le trajet, ca signifie un arret de rechargement)
 def combineRoutes(route1,route2):
 	conditionsRespected = route1[0] and route2[0]
 	if conditionsRespected:
@@ -287,16 +306,21 @@ def combineRoutes(route1,route2):
 
 
 
-#Input	distanceMatrix
-#		la liste des stations de chargement
-#		le debut du trajet
-#		la fin du trajet
-#		le modele de drone
-#		la taille du colis
-#Output	un tuple indiquant
+##  getRoute
+#	Cette fonction est appelle pour determiner s'il existe un trajet securitaire entre deux points.
+#
+#  @param	distanceMatrix
+#			la liste des stations de chargement
+#			le debut du trajet
+#			la fin du trajet
+#			le modele de drone
+#			la taille du colis
+#			
+#  @return	un tuple indiquant
 #			un bool qui indique si le trajet est possible avec les conditions donnees
 #			le temps requis au trajet
 #			le chemin pris (lorsqu'il y a des doublons, ca represente les arrets aux stations de chargement)
+#
 def getRoute(distanceMatrix,chargingStations,start,end,bigDrone,packageSize):
 	path = directRoute(distanceMatrix,start,end,bigDrone,packageSize)
 	if path[0]:
@@ -320,9 +344,13 @@ def getRoute(distanceMatrix,chargingStations,start,end,bigDrone,packageSize):
 
 
 
-#Input	un dictionnaire
-#		une liste de valeurs a enlever
-#Output	une copie du dictinnaire sans les pairs qui contiennent cette valeur
+## wihtoutValues
+#  Cette fonction permet d'obtenir une copie d'une dictionnaire qui n'inclus pas les valeurs specifies
+#
+#  @param	un dictionnaire a copier
+#			une liste des valeurs a ommettre
+#
+#  @return	une copie du dictionnaire sans les valeurs de "vals"
 def withoutValues(dic,vals):
 	copy = {}
 	for e in dic:
@@ -332,9 +360,13 @@ def withoutValues(dic,vals):
 	return copy
 
 
-#Input	un dictionnaire
-#		une liste de keys a enlever
-#Output	une copie du dictionnaire sans les pairs ayant ces keys
+## withoutKeys
+#  Cette fonction permet d'obtenir une copie d'un dictionnaire sans les cles specifiees.
+#
+#  @param	un dictionnaire a copier
+#			une liste de cles a ommettre
+#
+#  @return	une copie du dictionnaire sans les cles specifiees		
 def withoutKeys(dic,keys):
 	copy = {}
 	for e in dic:
@@ -344,6 +376,12 @@ def withoutKeys(dic,keys):
 	return copy
 	
 
+## afficherParcous
+#  Cette fonction permet d'afficher les informations retires de getRoute pour un utilisateur.
+#
+#  @param	path: un tuple representant le trajet entre un point a et un point b (la sortie de getRoute)
+#			taille: la grosseur du colis (small(0), medium(1), large(2))
+#
 def afficherParcours(path,taille):
 	if path[0][2][0] == path[0][2][-1]:
 		print("Le debut et la fin fin sont au meme endroit. Une livraison n'est donc pas necessaire...")
