@@ -68,7 +68,8 @@ def genererHasse(str):
         # Si une autre lettres est entrer, demander de nouveau
 
 
-while str != "c":
+lettre = ''
+while lettre != "c":
     lettre = raw_input("\n----------- MENU GENERAL --------------------\n"
                        "(a) Creer et afficher le graphe des recettes.\n"
                        "(b) Generer et afficher le diagramme de Hasse.\n"
