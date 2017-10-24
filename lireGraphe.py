@@ -407,14 +407,3 @@ def afficherParcours(path,taille):
 		else:
 			print("Il est possible d'utiliser le drone a 3.3A.")
 
-"""
-weights,chargingStations = creerGraphe("arrondissements.txt")
-#lireGraphe(weights)
-
-allDist = createDistanceMatrix(weights)
-
-trip = (5,12)		#	(a,b) le trajet du point a au point b
-package = 2		#	small(0), medium(1), large(2)
-
-afficherParcours(checkForPossibleRoutes(allDist,chargingStations,trip[0],trip[1],package),package)
-"""
