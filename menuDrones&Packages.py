@@ -6,9 +6,9 @@ def menuGlobal():
     firstRun = True
     listeDadjacence = {}
     allDist = {}
-    exitCall = False
+    choix = ''
 
-    while not exitCall:
+    while choix != '3':
         print("\n***********************************************************"
               "\n\nLogiciel de calcul du plus court chemin dans une ville\n")
         if firstRun:
@@ -51,8 +51,7 @@ def menuGlobal():
         elif choixGlobal == 2:
             menuPlusCourtChemin(listeDadjacence,chargingStations, allDist)
 
-        elif choixGlobal == 3:
-            exitCall = True
+
 
 def menuPlusCourtChemin(listeDadjacence, chargingStations, allDistanceMatrix):
 
