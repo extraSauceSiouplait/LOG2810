@@ -1,20 +1,30 @@
-import numpy
 import copy
 
-# from nested_dict import nested_dict
+
 
 def creerGrapheOriente(nomFichier, printCall):
 
     indicesToRecettes={}
     ingredients={}
+    try:
+        data = open("./" + nomFichier, "r")  # Ouvrir le fichier en parametre
 
-    data = open("./" + nomFichier, "r")  # Ouvrir le fichier en parametre
+    except Exception:
+            print("Erreur lors de la lecture de: " + nomFichier + ". Retour au menu principal.")
+            return
 
     for line in data:
         temp = line.strip('\n').strip('\r').split(",")                          # Enlever \n et \r et separer la ligne en 2 autour de la virgule
 
         if len(temp) == 2:                                                      # Pour ignorer la ligne vide
-            temp[0] = int(temp[0])                                              # Convertir string en int
+
+            try:
+                temp[0] = int(temp[0])                                              # Convertir string en int
+
+            except ValueError:
+                print("****\n"
+                      "Format d'entree incorrect. Les lignes qui ne respectent pas le formatage seront ignorees.\n")
+                continue
 
             if any(x.isalpha() for x in temp[1]):                               # Si la deuxieme valeur est alpha, mettre dans recette
                 indicesToRecettes[temp[0]] = temp[1]
@@ -22,17 +32,23 @@ def creerGrapheOriente(nomFichier, printCall):
                 #    recette[1] = "dejeuner"
 
             elif temp[1].isdigit():                                             # Si la deuxieme valeur est digit, mettre dans ingredient
-                temp[1] = int(temp[1])
+                temp[1] =    int(temp[1])
 
-                if not ingredients.has_key(temp[0]):
-                    ingredients[temp[0]] = []                                    # Creer une liste de liste, chaque ingredient a une liste de recette(s) dans lesquelles il est present
+                if temp[0] in ingredients.get(temp[1], []) :
+                    print("Erreur: Symmetrie rencontree dans les recettes. C'est hautement paradoxal, la deuxieme recette (causant la symmetrie) sera ignoree.")
 
-                if temp[1] not in ingredients[temp[0]]:                          # Si l'ingredient n'est pas deja dans la liste
-                    ingredients[temp[0]].append(temp[1])
+                else:
+                    if not ingredients.has_key(temp[0]):
+                        ingredients[temp[0]] = []                                    # Creer une liste de liste, chaque ingredient a une liste de recette(s) dans lesquelles il est present
+
+                    if temp[1] not in ingredients[temp[0]]:                          # Si l'ingredient n'est pas deja dans la liste
+                        ingredients[temp[0]].append(temp[1])
 
     if printCall:
         print("\n*******************************************************************\n"
-              "Liste des ingredients et des recettes auxquelles ils sont associes.\n")
+              "Liste des ingredients et des recettes auxquelles ils sont associes.\n"
+              "\n"
+              "Element(#) : Recette1ContenantElement(#), Recette2ContenantElement(#), ...\n")
         printRecettes(indicesToRecettes, ingredients)
     return (indicesToRecettes, ingredients)
 
@@ -55,32 +71,17 @@ def hasseRecursif(ingredient, recettesAssociees, ingredients, indiceToRecettes, 
     for recetteAssociee in recettesAssociees:
 
         if ingredients.has_key(recetteAssociee):
-            hasseRecursif(recetteAssociee, ingredients[recetteAssociee], ingredients, indiceToRecettes, firstEncounter, listeOutput)
+
+
+            if recetteAssociee not in ingredients[recetteAssociee] or firstEncounter:
+                firstEncounter = False
+                hasseRecursif(recetteAssociee, ingredients[recetteAssociee], ingredients, indiceToRecettes, firstEncounter, listeOutput)
 
         else:
-            listeOutput += indiceToRecettes[recetteAssociee] + "(" + str(recetteAssociee) + ") "
-            print("Liste " + " : " + listeOutput)
-
-
-""""
-def affichageHasse(ingredient, recettesAssociees, ingredients, indiceToRecettes, firstE):        # Fonction recursive utiliser pour genererHasse
-
-    print("Liste " + str(count) + " : ")
+            print("Liste  : " + listeOutput + indiceToRecettes[recetteAssociee] + "(" + str(recetteAssociee) + ") ")
 
 
 
-    listeIngredients = ingredient + " (" + indiceToRecettes[ingredient] + ") : "               # Affichage de la recette
-
-    if recettesAssociees != 0:
-        for recetteAssociee in recettesAssociees:                                             # Parcourir toutes les recettes associees a l'ingredient
-
-            if  firstTime:                                   # Si l'ingredient a lui meme des ingredients
-                if recetteAssociee in ingredients[recetteAssociee]:          # Pour eviter boucle infinie, ne repeter qu'une fois si la recette est aussi dans sa propre liste d'ingredient
-                    firstTime = False
-                affichageHasse(recetteAssociee, ingredients, indiceToRecettes, firstTime)  # Recursion
-            listeIngredients = listeIngredients + indiceToRecettes[x] + " (" + str(x) + "), "
-    print(listeIngredients[:-2])
-"""
 
 def genererHasse(nomFichier):
     # Generer les dictionaires de recette et d'ingredient sans affichage (printCall = False)
@@ -97,6 +98,8 @@ def genererHasse(nomFichier):
             if recetteAssociee in ingredientsMinimaux:
                 ingredientsMinimaux.pop(recetteAssociee)
 
+
+
     for ingredient in ingredientsMinimaux:
         if ingredients.has_key(ingredient):
             listeOutput = ""
@@ -109,14 +112,18 @@ def genererHasse(nomFichier):
         # Si une autre lettres est entrer, demander de nouveau
 
 
-lettre = ''
-while lettre != "c":
-    lettre = raw_input("\n----------- MENU GENERAL --------------------\n"
-                       "(a) Creer et afficher le graphe des recettes.\n"
-                       "(b) Generer et afficher le diagramme de Hasse.\n"
-                       "(c) Quitter.\n")
-    if lettre == "a":
-        creerGrapheOriente("manger.txt", True)
 
-    elif lettre == "b":
-        genererHasse("manger.txt")
+
+def menuGlobal():
+
+    lettre = ''
+    while lettre != "c":
+        lettre = raw_input("\n----------- MENU RECETTES --------------------\n"
+                           "(a) Creer et afficher le graphe des recettes.\n"
+                           "(b) Generer et afficher le diagramme de Hasse.\n"
+                           "(c) Quitter.\n")
+        if lettre == "a":
+            creerGrapheOriente("manger.txt", True)
+
+        elif lettre == "b":
+            genererHasse("manger.txt")

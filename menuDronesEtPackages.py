@@ -8,7 +8,8 @@ def menuGlobal():
     allDist = {}
     choix = ''
 
-    while choix != '3':
+    while choix != 'c':
+
         print("\n***********************************************************"
               "\n\nLogiciel de calcul du plus court chemin dans une ville\n")
         if firstRun:
@@ -25,18 +26,16 @@ def menuGlobal():
                 print("Le fichier de carte par defaut, \"arrondissements.txt\" n'a pas ete trouve dans le dossier. Veuillez \n"
                       "mettre a jour la carte en utilisant l'option 1.\n\n")
 
-        print("----------------   MENU GLOBAL  -----------------\n"
-              "(1) Mettre a jour la carte.\n"
-              "(2) Determiner le plus court chemin securitaire pour mon paquet.\n"
-              "(3) Quitter.\n")
+        print("----------------   MENU DRONES ET PAQUETS  -----------------\n"
+              "(a) Mettre a jour la carte.\n"
+              "(b) Determiner le plus court chemin securitaire pour mon paquet.\n"
+              "(c) Quitter.\n")
 
 
-        choixGlobal = input("Veuillez entrer votre choix d'option: ")
-        while choixGlobal not in [1,2,3]:
-            choixGlobal = input("Entree non valide, veuillez entrer votre choix d'option: ")
+        choix = raw_input("Veuillez entrer votre choix d'option: ")
 
 
-        if choixGlobal == 1:
+        if choix == 'a':
             print("------- Menu mise a jour de la carte -----------")
 
             try:
@@ -48,8 +47,12 @@ def menuGlobal():
             else:
                 allDist = lireGraphe.createDistanceMatrix(listeDadjacence)
 
-        elif choixGlobal == 2:
+        elif choix == 'b':
             menuPlusCourtChemin(listeDadjacence,chargingStations, allDist)
+
+
+    print("Retour au menu principal\n")
+
 
 
 
@@ -186,10 +189,3 @@ def menuMiseAJour():
 
         return newListeDadjacence, charginStations
 
-
-if __name__ == "__main__":
-
-    menuGlobal()
-
-
-    print("****** Fin du programme. Au revoir! ******")
