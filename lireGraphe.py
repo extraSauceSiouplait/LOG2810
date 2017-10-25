@@ -377,32 +377,39 @@ def withoutKeys(dic,keys):
 #			taille: la grosseur du colis (small(0), medium(1), large(2))
 #
 def afficherParcours(path,taille):
-	if path[0][2][0] == path[0][2][-1]:
-		print("Le debut et la fin fin sont au meme endroit. Une livraison n'est donc pas necessaire...")
-	elif not path[0][0]:
-		print("Il est impossible de completer securitairement cette livraison.")
-	else:
-		if taille == 0:
-			t = "petit"
-		elif taille == 1:
-			t = "moyen"
-		else:
-			t = "large"
-		print("Taille du colis: " + t)
-		print("De " + str(path[0][2][0]) + " a " + str(path[0][2][-1]))
-		print("Duree totale: " + str(path[0][1]) + " minutes")
-		print("Le trajet a suivre: ")
-		previous = path[0][2][-1]
-		trajet = str(path[0][2][0])
-		for city in path[0][2][1:]:
-			if city == previous:
-				trajet += " (arret de recharge)"
-			else:
-				trajet = trajet + " -> " + str(city)
-			previous = city
-		print(trajet)
-		if path[1] == 1:
-			print("Il serait necessaire d'utiliser le drone a 5A.")
-		else:
-			print("Il est possible d'utiliser le drone a 3.3A.")
+    
+    if path[0][2][0] == path[0][2][-1]:
+        print("Le debut et la fin fin sont au meme endroit. Une livraison n'est donc pas necessaire...")
+    elif not path[0][0]:
+        print("Il est impossible de completer securitairement cette livraison.")
+    else:
+        if taille == 0:
+            t = "petit"
+        elif taille == 1:
+            t = "moyen"
+        else:
+            t = "large"
+        print("Taille du colis: " + t)
+        print("De " + str(path[0][2][0]) + " a " + str(path[0][2][-1]))
+        print("Duree totale: " + str(path[0][1]) + " minutes")
+        print("Le trajet a suivre: ")
+
+        if len(path[0][2]) == 2:          # COndition spéciale si les deux sommets sont adjacents
+            print(str(path[0][2][0]) + " -> " + str(path[0][2][1]))
+
+        else:    
+            previous = path[0][2][-1]
+            trajet = str(path[0][2][0])
+
+            for city in path[0][2][1:]:
+                if city == previous:
+                    trajet += " (arret de recharge)"
+                else:
+                    trajet = trajet + " -> " + str(city)
+                previous = city
+            print(trajet)
+        if path[1] == 1:
+            print("Il serait necessaire d'utiliser le drone a 5A.")
+        else:
+            print("Il est possible d'utiliser le drone a 3.3A.")
 
