@@ -43,7 +43,7 @@ def creerGraphe(str):
                 temp[i] = int(temp[i])
 
                 if temp[i] < 0:
-                    raise TypeError("Entier négatif trouvé dans les données de: " + str + " . Assurez vous que celles-ci soit de format:"
+                    raise ValueError("Entier négatif trouvé dans les données de: " + str + " . Assurez vous que celles-ci soit de format:"
                         "x,y,z où les deux premières valeurs sont des ENTIERS POSITIFS et la dernière un RÉEL POSITIF. Ils représentent dans l'ordre, le quartier de départ,"
                         "celui d'arrivée et la distance (en min) entre ceux-ci")
 
@@ -66,7 +66,7 @@ def creerGraphe(str):
                         "celui d'arrivée et la distance (en min) entre ceux-ci")
 
     if len(chargingStationsDict) == 0:
-        raise TypeError("Aucune station de recharge détectée, la lecture des données de la carte semble toutefois correcte.")
+        print("Aucune station de recharge détectée, la lecture des données de la carte semble toutefois correcte.")
 
 
     return (weightsDict,chargingStationsDict)
@@ -137,7 +137,7 @@ def dijkstra(adjacenceList, start):
     predecessors = {}
 
     if start not in adjacenceList:
-        raise TypeError("Le point de départ n\'est pas présent pas dans la carte")
+        raise ValueError("Le point de départ n\'est pas présent pas dans la carte")
 
     #Initialise les coûts (infini pour les
     #sommets non visités
@@ -199,13 +199,12 @@ def printShortestPath(graph, start, end):
 #  une liste du de int representant le meilleur chemin entre les deux points
 def createDistanceMatrix(graph):
     allDistances = {}
-    for start in graph:
+    for i,start in enumerate(graph):
         d,p = dijkstra(graph, start)
         allDistances[start] = {}
 
         for end in graph:
             allDistances[start][end] = convertDistanceAndPath(d,p,start,end)
-
     return allDistances
 
 
