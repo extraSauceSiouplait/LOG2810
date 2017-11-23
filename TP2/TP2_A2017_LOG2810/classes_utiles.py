@@ -197,7 +197,11 @@ class DeliveryRequest:
                     print(temp[2] + " is not a valid weight")
 
         temp_queue = Queue.Queue()
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 7a3903186e371fc1cf2ac0ed35d5592586cc80ce
         while not self.priority_queue.empty():
             delivery = self.priority_queue.get()
 
@@ -231,7 +235,11 @@ class RecordKeeper:
     def add_invalid_request(self):
         self.n_invalid_requests += 1
 
+<<<<<<< HEAD
     # 
+=======
+    #
+>>>>>>> 7a3903186e371fc1cf2ac0ed35d5592586cc80ce
     # A CHANGER WARNING WARNING
     #
     def get_drone_average_delivery(self, weight_limit_grams, fleet):
