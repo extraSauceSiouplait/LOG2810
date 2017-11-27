@@ -19,7 +19,7 @@ class PostalCodeAutomaton:
         :rtype: bool
         """
         if len(word) != 6 or not (word[0].isnumeric() or word[1].isalpha() or word[2].isnumeric() or word[3].isalpha or
-                                      word[4].isnumeric() or word[5].isalpha):
+                                    word[4].isnumeric() or word[5].isalpha):
             print("This file contains invalid entries. " + word + " is not a postal code." +
                   "Un code postal est une chaîne de six caractères alphanumériques, "
                   "qui utilise le format A1B2C3, alternant lettres et chiffres.")
@@ -31,9 +31,9 @@ class PostalCodeAutomaton:
     def validate_postal_code(self, postal_code, keeper):
         """
 
-        :param postal_code:
-        :param keeper:
-        :return:
+        :param postal_code: le code postal à valider (chercher dans la liste des codes postaux ajoutés)
+        :param keeper: Un registre à fins statistiques
+        :return: Indique si le code est valide ou non
         """
         current_state = self.possible_states[0]
         code = list(postal_code)
@@ -49,7 +49,7 @@ class PostalCodeAutomaton:
                     current_state = self.possible_states[1]
 
             if current_state == self.possible_states[1]:
-                if code[1] in self.recognized_postal_codes[code[0]]:
+                if not code[1] in self.recognized_postal_codes[code[0]]:
                     # print(str(code[1]) + "not in dictionnary")
                     keeper.add_invalid_request()
                     return False
@@ -97,6 +97,10 @@ class PostalCodeAutomaton:
         return True
 
     def creer_arbre_addresses(self, filename):
+        """
+
+        :param filename: le fichier.txt d'ou importer les codes postaux
+        """
         self.recognized_postal_codes = {}
         data = open("./" + filename, "r")
 
