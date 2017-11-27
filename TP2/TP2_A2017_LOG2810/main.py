@@ -33,7 +33,7 @@ fleet.deliver_packages(history)
 print("successful deliveries: " + str(history.n_successful_deliveries))
 
 #Step6: Create DeliveryRequest object to handle requests
-requests = DeliveryRequest("H3S2B2")
+requests = DeliveryRequest()
 
 #Step7: Process request
 requests.traiter_les_requetes("requetes1.txt",dave,fleet,history)
@@ -59,3 +59,9 @@ print("successful deliveries: " + str(history.n_successful_deliveries))
 #for x in range(0,10):
    # requests.traiter_les_requetes("r0.txt",dave,fleet,history)
 print("successful deliveries: " + str(history.n_successful_deliveries))
+
+print("\n\nAverage " + str(history.getDroneAverageDelivery(1000, fleet)) + "\n\n")
+print("\n\nAverage " + str(history.getDroneAverageDelivery(5000, fleet)) + "\n\n")
+history.imprimerLesStatistiques()
+
+fleet.summarize_fleet_stats()
