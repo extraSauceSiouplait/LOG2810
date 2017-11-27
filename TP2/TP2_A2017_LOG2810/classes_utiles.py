@@ -11,28 +11,28 @@ class Delivery:
 class Drone:
 
 	def __init__(self,location,maxLoad):
-		self.currentLocation = location
+		self.current_location = location
 		self.destination = location
 		self.deliveries = []
-		self.currentLoad = 0
-		self.remainingCapacity = maxLoad
-		self.maximumLoad = maxLoad
+		self.current_load = 0
+		self.remaining_capacity = maxLoad
+		self.maximum_load = maxLoad
 
-	def updateWeight(self):
-            self.currentLoad = 0
-            self.remainingCapacity = self.maximumLoad
+	def update_weight(self):
+            self.current_load = 0
+            self.remaining_capacity = self.maximum_load
             for d in self.deliveries:
-                self.currentLoad += d.weight
-		self.remainingCapacity -= d.weight
+                self.current_load += d.weight
+		self.remaining_capacity -= d.weight
 
-	def deliveryIsPossible(self,d):
-		if d.weight > self.remainingCapacity:
-		    #print("too much weight: Max="+str(self.remainingCapacity)+" weight="+str(d.weight))	
+	def delivery_is_possible(self,d):
+		if d.weight > self.remaining_capacity:
+		    #print("too much weight: Max="+str(self.remaining_capacity)+" weight="+str(d.weight))	
                     return False
-		if d.origin != self.currentLocation:
+		if d.origin != self.current_location:
                     #print("Not at correct starting location")
 	    	    return False
-		if len(self.deliveries) == 0 and self.destination != self.currentLocation and d.destination != self.destination:
+		if len(self.deliveries) == 0 and self.destination != self.current_location and d.destination != self.destination:
 		    #print("This drone is already assigned to go somewhere")
                     return False
 		if len(self.deliveries) > 0 and d.destination != self.deliveries[0].destination:
@@ -40,296 +40,296 @@ class Drone:
                     return False
 		return True
 
-	def addPackage(self,d):
-		if not self.deliveryIsPossible(d):
-			#print(str(self.remainingCapacity)+"\tCannot add package to this drone")
+	def add_package(self,d):
+		if not self.delivery_is_possible(d):
+			#print(str(self.remaining_capacity)+"\tCannot add package to this drone")
 			return False
 		else:
 			self.deliveries.append(d)
-			self.updateWeight()
+			self.update_weight()
 			self.destination = d.destination
 			return True
 
-	def droneIsAvailable(self):
+	def drone_is_available(self):
                 #if the drone has any deliveries in its list
 		if len(self.deliveries) > 0:
 			return False
                 #if the drone's destination differes from its current location
-		elif self.currentLocation != self.destination :
+		elif self.current_location != self.destination :
 			return False
 		else:
 			return True
 
-	def deployTo(self,location):
+	def deploy_to(self,location):
 		self.destination = location
 
 	def deliver(self,keeper):
-		if self.currentLocation != self.destination or len(self.deliveries)>0:
-			self.currentLocation = self.destination
+		if self.current_location != self.destination or len(self.deliveries)>0:
+			self.current_location = self.destination
                         if len(self.deliveries)>0:
                             d = self.deliveries[0]
 			    self.deliveries.remove(d)
-			    self.currentLoad = self.currentLoad - d.weight
-			    self.remainingCapacity = self.remainingCapacity + d.weight
-			    keeper.addDelivery()
+			    self.current_load = self.current_load - d.weight
+			    self.remaining_capacity = self.remaining_capacity + d.weight
+			    keeper.add_delivery()
 			return True
 		else:
 			#print("No need to move from here")
-			if self.currentLoad != 0.0 or self.remainingCapacity != self.maximumLoad or self.destination != self.currentLocation:
+			if self.current_load != 0.0 or self.remaining_capacity != self.maximum_load or self.destination != self.current_location:
 				print("There was a mistake somewhere")
 				return False
 			else:
 				return True
 
-	def displayDroneStats(self):
-		print("Max weight: " + str(self.maximumLoad))
-		print("RemainingCapacity: " + str(self.remainingCapacity))
-		print("Current Location: " + self.currentLocation)
+	def display_drone_stats(self):
+		print("Max weight: " + str(self.maximum_load))
+		print("RemainingCapacity: " + str(self.remaining_capacity))
+		print("Current Location: " + self.current_location)
 		print("Destination: " + self.destination)
 
 		
 class DroneFleet:
-	def __init__(self,startingLocation):
+	def __init__(self,starting_location):
 		self.units = []
 		self.types = {}
-		self.home = startingLocation
+		self.home = starting_location
 	
-	def addDroneType(self,weightLimitInGrams):
-		self.types[weightLimitInGrams] = 0
+	def add_drone_type(self,weight_limit_in_grams):
+		self.types[weight_limit_in_grams] = 0
 	
-	def addNdrones(self,weightLimitInGrams,nDrones):
-		self.types[weightLimitInGrams] = self.types[weightLimitInGrams] + nDrones
+	def add_n_drones(self,weight_limit_in_grams,nDrones):
+		self.types[weight_limit_in_grams] = self.types[weight_limit_in_grams] + nDrones
 		for x in range(nDrones):
-			self.units.append(Drone(self.home,weightLimitInGrams))
+			self.units.append(Drone(self.home,weight_limit_in_grams))
 		
-	def nDronesAvailable(self,weightLimitInGrams):
+	def n_drones_available(self,weight_limit_in_grams):
 		count = 0
 		for drone in self.units:
-			if drone.remainingCapacity == weightLimitInGrams:
+			if drone.remaining_capacity == weight_limit_in_grams:
 				count += 1
 		return count
 
-	def listDronesInFleet(self):
+	def list_drones_in_fleet(self):
 		for model in self.types:
 			print("This fleet contains a total of " + str(self.types[model]) + " drone that is able to carry a maximum of " + str(model) + " grams.")
-			print(str(self.nDronesAvailable(model)) + " of which are available (not currently assigned to a task)")
+			print(str(self.n_drones_available(model)) + " of which are available (not currently assigned to a task)")
 
-	def summarizeFleetStats(self):
+	def summarize_fleet_stats(self):
 		print("______________________________________________________________________________________")
 		print("Available\tLocation\tDestination\tMaxCapacity\tRemainingCap")
 		for unit in self.units:
-			print(str(unit.droneIsAvailable())+"\t\t"+unit.currentLocation+"\t\t"+unit.destination+"\t\t"+str(unit.maximumLoad)+"\t\t"+str(unit.remainingCapacity))
+			print(str(unit.drone_is_available())+"\t\t"+unit.current_location+"\t\t"+unit.destination+"\t\t"+str(unit.maximum_load)+"\t\t"+str(unit.remaining_capacity))
 		print("______________________________________________________________________________________")
 
 
-	def addDelivery(self,d):
-		keyList = self.types.keys()
-		keyList.sort()
-		for model in keyList:
+	def add_delivery(self,d):
+		key_list = self.types.keys()
+		key_list.sort()
+		for model in key_list:
 			for unit in self.units:
-				if unit.maximumLoad == model:
+				if unit.maximum_load == model:
                                         #print("Load size = " + str(d.weight) + "\tMax load: " + str(model))
-					if unit.addPackage(d):
+					if unit.add_package(d):
 						return True
 		return False
 
-	def sendADroneTo(self,d):
+	def send_a_drone_to(self,d):
                 #get list of all drone types
-		keyList = self.types.keys()
+		key_list = self.types.keys()
                 
                 #put them in numerical order
-		keyList.sort()
+		key_list.sort()
 		
-                for model in keyList:
+                for model in key_list:
                         #print("now looking at model #" + str(model))
 			for unit in self.units:
-				if unit.maximumLoad == model:
-                                    if unit.droneIsAvailable(): 
-					if d.weight <= unit.remainingCapacity:
-                                            #unit.remainingCapacity -= d.weight
-                                            unit.deployTo(d.origin)
+				if unit.maximum_load == model:
+                                    if unit.drone_is_available(): 
+					if d.weight <= unit.remaining_capacity:
+                                            #unit.remaining_capacity -= d.weight
+                                            unit.deploy_to(d.origin)
 					    return True
 		return False
 
-	def deliverPackages(self,keeper):
+	def deliver_packages(self,keeper):
 		for unit in self.units:
 			unit.deliver(keeper)
 
-	def reequilibrateFleet(self,automat):
+	def reequilibrate_fleet(self,automat):
                 #1) List all postal codes
-                #print("beginning postalCodes")
-		listOfPostalCodes = list(automat.unorganizedPostalCodes)
-                #print(listOfPostalCodes)
-		#print(listOfPostalCodes)
+                #print("beginning postal_codes")
+		list_of_postal_codes = list(automat.unorganized_postal_codes)
+                #print(list_of_postal_codes)
+		#print(list_of_postal_codes)
                 #2) For each non-available drone
                 for unit in self.units:
-                        #print(str(unit.maximumLoad) +"\t" + str(unit.droneIsAvailable()))
-			if not unit.droneIsAvailable():
-                            if unit.destination in listOfPostalCodes:
+                        #print(str(unit.maximum_load) +"\t" + str(unit.drone_is_available()))
+			if not unit.drone_is_available():
+                            if unit.destination in list_of_postal_codes:
                                 #3) subtract their destination from the list of postal codes
                                 #print(unit.destination)
-                                listOfPostalCodes.remove(unit.destination)
-                #print(listOfPostalCodes)
+                                list_of_postal_codes.remove(unit.destination)
+                #print(list_of_postal_codes)
                 #4) Dispatch them to different locations selected at random
                 for unit in self.units:
-                    if unit.droneIsAvailable():
-                        #print(listOfPostalCodes)
+                    if unit.drone_is_available():
+                        #print(list_of_postal_codes)
                         #print("remaining Postal codes:")
-                        #print(listOfPostalCodes)
-                        d = random.sample(listOfPostalCodes,1)[0]
+                        #print(list_of_postal_codes)
+                        d = random.sample(list_of_postal_codes,1)[0]
                         #print(d)
-                        unit.deployTo(d)
-                        listOfPostalCodes.remove(d)
+                        unit.deploy_to(d)
+                        list_of_postal_codes.remove(d)
                         #print("deploying unit to " + d)
 				
 
 
 class DeliveryRequest:
 	def __init__(self,defaultLocation):
-		self.requestQueue = Queue.Queue()
-		self.priorityQueue = Queue.Queue()
-	def traiterLesRequetes(self,filename,auto,fleet,keeper):
+		self.request_queue = Queue.Queue()
+		self.priority_queue = Queue.Queue()
+	def traiter_les_requetes(self,filename,auto,fleet,keeper):
 		data = open("./" + filename, "r")
 		for line in data:
 		    temp = line.strip('\n').strip('\r').split(" ")
 	            #print(temp)
-		    if (auto.validatePostalCode(temp[0],keeper) and auto.validatePostalCode(temp[1],keeper) and (temp[2]).isdigit()):
+		    if (auto.validate_postal_code(temp[0],keeper) and auto.validate_postal_code(temp[1],keeper) and (temp[2]).isdigit()):
 			print("origin: " + temp[0] + "\tDestination: " + temp[1] + "\tWeight: " + temp[2])
 			d = Delivery(temp[0],temp[1],temp[2])
-			self.requestQueue.put(d)
+			self.request_queue.put(d)
 		    else:
                         print("A request did not meet standards:")
-			if(not auto.validatePostalCode(temp[0],keeper)):
+			if(not auto.validate_postal_code(temp[0],keeper)):
 			    print("\t" + temp[0] + " is not a valid postal code")
-			if(not auto.validatePostalCode(temp[1],keeper)):
+			if(not auto.validate_postal_code(temp[1],keeper)):
 			    print("\t" + temp[1] + " is not a valid postal code")
 			if(not temp[2].isdigit()):
 			    print("\t" + temp[2] + " is not a valid weight")
                 
                 print("creating temp queue")
-		tempQueue = Queue.Queue()
+		temp_queue = Queue.Queue()
                 
-                #fleet.summarizeFleetStats()
+                #fleet.summarize_fleet_stats()
                 
                 print("verifying prioroty queue")
-	        while(not self.priorityQueue.empty()):
-			delivery = self.priorityQueue.get()
-			if not fleet.addDelivery(delivery):
-				fleet.sendADroneTo(delivery)
-				tempQueue.put(delivery)				
+	        while(not self.priority_queue.empty()):
+			delivery = self.priority_queue.get()
+			if not fleet.add_delivery(delivery):
+				fleet.send_a_drone_to(delivery)
+				temp_queue.put(delivery)				
                 
-                #fleet.summarizeFleetStats()
+                #fleet.summarize_fleet_stats()
                 
                 print("verifying reqQueue")
-		while(not self.requestQueue.empty()):
-			delivery = self.requestQueue.get()
+		while(not self.request_queue.empty()):
+			delivery = self.request_queue.get()
                         #print("delivery weight: " + str(delivery.weight))
-			if not fleet.addDelivery(delivery):
+			if not fleet.add_delivery(delivery):
                             if delivery.weight <= max(fleet.types.keys()):
                                 #print("delivery not possible at the moment. Sending a drone to pickup location")
-			        fleet.sendADroneTo(delivery)
-			        tempQueue.put(delivery)
+			        fleet.send_a_drone_to(delivery)
+			        temp_queue.put(delivery)
                             else:
                                 print("The maximum deliverable weight is "+str(max(fleet.types.keys()))+". With a weight of "+str(delivery.weight)+", this delivery is not possible.")
-                                keeper.addInvalidRequest()
+                                keeper.add_invalid_request()
 	        
                 
-                #fleet.summarizeFleetStats()
+                #fleet.summarize_fleet_stats()
                 
                 print("transferring contents of temp queue to priorityqueue")
-		while(not tempQueue.empty()):
-			self.priorityQueue.put(tempQueue.get())
+		while(not temp_queue.empty()):
+			self.priority_queue.put(temp_queue.get())
 
                 print("fleet equilibration")
-		fleet.reequilibrateFleet(auto)
+		fleet.reequilibrate_fleet(auto)
                 
-                #fleet.summarizeFleetStats()
+                #fleet.summarize_fleet_stats()
                 
                 print("package delivery")
-                fleet.deliverPackages(keeper)
+                fleet.deliver_packages(keeper)
                 
-                #fleet.summarizeFleetStats()
+                #fleet.summarize_fleet_stats()
 
 
 
 class RecordKeeper:
 	def __init__(self):
-		self.nSuccessfulDeliveries = 0
-		self.nInvalidRequests = 0
-	def addDelivery(self):
-		self.nSuccessfulDeliveries += 1
-	def addInvalidRequest(self):
-		self.nInvalidRequests += 1
-	def getDroneAverageDelivery(self,weightLimitInGrams,fleet):
-		return (self.nSuccessfulDeliveries/fleet.types[weightLimitInGrams])
+		self.n_successful_deliveries = 0
+		self.n_invalid_requests = 0
+	def add_delivery(self):
+		self.n_successful_deliveries += 1
+	def add_invalid_request(self):
+		self.n_invalid_requests += 1
+	def getDroneAverageDelivery(self,weight_limit_in_grams,fleet):
+		return (self.n_successful_deliveries/fleet.types[weight_limit_in_grams])
         def imprimerLesStatistiques(self):
-                print("Le nombre de livraisons completes a date: "+str(self.nSuccessfulDeliveries))
-                print("Le nombre de requetes invalides: " + str(self.nInvalidRequests))
+                print("Le nombre de livraisons completes a date: "+str(self.n_successful_deliveries))
+                print("Le nombre de requetes invalides: " + str(self.n_invalid_requests))
                 #print le nombre de drones dans chaque quartier
                 #print le nombre moyen de colis transportes par un drone a petite capacite
                 #print le nombre moyen de colis transportes par un drone a grande capacite
 
 class PostalCodeAutomaton:
-	possibleStates = [0,1,2,3,4,5,6]
+	possible_states = [0,1,2,3,4,5,6]
 
 	def __init__(self):
 		self.name = "Dave"
-		self.recognizedPostalCodes = {}
-		self.unorganizedPostalCodes = []
+		self.recognized_postal_codes = {}
+		self.unorganized_postal_codes = []
 
-	def validatePostalCode(self,postalCode,keeper):
-		currentState = self.possibleStates[0]
-		code = list(postalCode)
-		while(currentState != self.possibleStates[6]):
-			if (currentState == self.possibleStates[0]):
-				if (not code[0] in self.recognizedPostalCodes):
+	def validate_postal_code(self,postal_code,keeper):
+		current_state = self.possible_states[0]
+		code = list(postal_code)
+		while(current_state != self.possible_states[6]):
+			if (current_state == self.possible_states[0]):
+				if (not code[0] in self.recognized_postal_codes):
 					#print(str(code[0]) + "not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[1]
-			if (currentState == self.possibleStates[1]):
-				if (not code[1] in self.recognizedPostalCodes[code[0]]):
+					current_state = self.possible_states[1]
+			if (current_state == self.possible_states[1]):
+				if (not code[1] in self.recognized_postal_codes[code[0]]):
 					#print(str(code[1]) + "not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[2]
-			if (currentState == self.possibleStates[2]):
-				if (not code[2] in self.recognizedPostalCodes[code[0]][code[1]]):
+					current_state = self.possible_states[2]
+			if (current_state == self.possible_states[2]):
+				if (not code[2] in self.recognized_postal_codes[code[0]][code[1]]):
 					#print(str(code[2]) + "not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[3]
-			if (currentState == self.possibleStates[3]):
-				if (not code[3] in self.recognizedPostalCodes[code[0]][code[1]][code[2]]):
+					current_state = self.possible_states[3]
+			if (current_state == self.possible_states[3]):
+				if (not code[3] in self.recognized_postal_codes[code[0]][code[1]][code[2]]):
 					#print(str(code[3]) + "not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[4]
-			if (currentState == self.possibleStates[4]):
-				if (not code[4] in self.recognizedPostalCodes[code[0]][code[1]][code[2]][code[3]]):
+					current_state = self.possible_states[4]
+			if (current_state == self.possible_states[4]):
+				if (not code[4] in self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]]):
 					#print(str(code[4]) + "not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[5]
-			if (currentState == self.possibleStates[5]):
-				if (not code[5] in self.recognizedPostalCodes[code[0]][code[1]][code[2]][code[3]][code[4]]):
+					current_state = self.possible_states[5]
+			if (current_state == self.possible_states[5]):
+				if (not code[5] in self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]][code[4]]):
 					#print(code[5])
-					#print(self.recognizedPostalCodes[code[0]][code[1]][code[2]][code[3]][code[4]])
+					#print(self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]][code[4]])
 					#print("last char not in dictionnary")
-					keeper.addInvalidRequest()
+					keeper.add_invalid_request()
 					return False
 				else:
-					currentState = self.possibleStates[6]
+					current_state = self.possible_states[6]
 
 		return True
 
-	def creerArbreAddresses(self,filename):
-		self.recognizedPostalCodes = {}
+	def creer_arbre_addresses(self,filename):
+		self.recognized_postal_codes = {}
 		data = open("./" + filename, "r")
 		for line in data:
 			temp = line.strip('\n').strip('\r').strip(' ')
@@ -337,20 +337,20 @@ class PostalCodeAutomaton:
 			if len(word) != 6:
 				print("This file contains invalid entries.")
 			else:
-				if (not word[0] in self.recognizedPostalCodes):
-					self.recognizedPostalCodes[word[0]] = {}
-				if (not word[1] in self.recognizedPostalCodes[word[0]]):
-					self.recognizedPostalCodes[word[0]][word[1]] = {}
-				if (not word[2] in self.recognizedPostalCodes[word[0]][word[1]]):
-					self.recognizedPostalCodes[word[0]][word[1]][word[2]] = {}
-				if (not word[3] in self.recognizedPostalCodes[word[0]][word[1]][word[2]]):
-					self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]] = {}
-				if (not word[4] in self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]]):
-					self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]][word[4]] = {}
-				if (not word[5] in self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]][word[4]]):
-					self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]][word[4]][word[5]] = {}
-				self.recognizedPostalCodes[word[0]][word[1]][word[2]][word[3]][word[4]][word[5]] = temp
-				self.unorganizedPostalCodes.append(temp)		
+				if (not word[0] in self.recognized_postal_codes):
+					self.recognized_postal_codes[word[0]] = {}
+				if (not word[1] in self.recognized_postal_codes[word[0]]):
+					self.recognized_postal_codes[word[0]][word[1]] = {}
+				if (not word[2] in self.recognized_postal_codes[word[0]][word[1]]):
+					self.recognized_postal_codes[word[0]][word[1]][word[2]] = {}
+				if (not word[3] in self.recognized_postal_codes[word[0]][word[1]][word[2]]):
+					self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]] = {}
+				if (not word[4] in self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]]):
+					self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]][word[4]] = {}
+				if (not word[5] in self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]][word[4]]):
+					self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]][word[4]][word[5]] = {}
+				self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]][word[4]][word[5]] = temp
+				self.unorganized_postal_codes.append(temp)		
 		
 #def main:
 
@@ -359,7 +359,7 @@ class PostalCodeAutomaton:
 #dave = PostalCodeAutomaton()
 
 #Step2: Feed automaton postal codes
-#dave.creerArbreAddresses("CodesPostaux.txt")
+#dave.creer_arbre_addresses("CodesPostaux.txt")
 
 #Step3: Create record keeper
 #history = RecordKeeper()
@@ -367,44 +367,44 @@ class PostalCodeAutomaton:
 #Step4: Create drone fleet
 #fleet = DroneFleet("H1W1B2")
 #types = [[5000,5],[1000,10]]
-#fleet.addDroneType(5000)
-#fleet.addDroneType(1000)
-#fleet.addNdrones(types[0][0],types[0][1])
-#fleet.addNdrones(types[1][0],types[1][1])
+#fleet.add_drone_type(5000)
+#fleet.add_drone_type(1000)
+#fleet.add_n_drones(types[0][0],types[0][1])
+#fleet.add_n_drones(types[1][0],types[1][1])
 
 #print(fleet.types.keys())
 
 #Step5: Dispatch drones to random places on the map
-#fleet.reequilibrateFleet(dave)
-#fleet.deliverPackages(history)
+#fleet.reequilibrate_fleet(dave)
+#fleet.deliver_packages(history)
 
 
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
 #Step6: Create DeliveryRequest object to handle requests
 #requests = DeliveryRequest("H3S2B2")
 
 #Step7: Process request
-#requests.traiterLesRequetes("requetes1.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+#requests.traiter_les_requetes("requetes1.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
 #Step8: (repeat)
-#requests.traiterLesRequetes("requetes2.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+#requests.traiter_les_requetes("requetes2.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
-#requests.traiterLesRequetes("requetes3.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+#requests.traiter_les_requetes("requetes3.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
-#requests.traiterLesRequetes("requetes4.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
-#requests.traiterLesRequetes("requetes5.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
-#requests.traiterLesRequetes("requetes6.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
-#requests.traiterLesRequetes("requetes7.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
-#requests.traiterLesRequetes("requetes8.txt",dave,fleet,history)
-#print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+#requests.traiter_les_requetes("requetes4.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+#requests.traiter_les_requetes("requetes5.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+#requests.traiter_les_requetes("requetes6.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+#requests.traiter_les_requetes("requetes7.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+#requests.traiter_les_requetes("requetes8.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 #for x in range(0,10):
-    #requests.traiterLesRequetes("r0.txt",dave,fleet,history)
-    #print("successful deliveries: " + str(history.nSuccessfulDeliveries))
+    #requests.traiter_les_requetes("r0.txt",dave,fleet,history)
+    #print("successful deliveries: " + str(history.n_successful_deliveries))
