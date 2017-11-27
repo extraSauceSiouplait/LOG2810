@@ -8,25 +8,25 @@ class Delivery:
 
 
 class DeliveryRequest:
-    def __init__(self, defaultLocation):
+    def __init__(self):
         self.request_queue = queue.Queue()
         self.priority_queue = queue.Queue()
 
-    def traiter_les_requetes(self, filename, auto, fleet, keeper):
+    def traiter_les_requetes(self, filename, automat, fleet, keeper):
         data = open("./" + filename, "r")
         for line in data:
             temp = line.strip('\n').strip('\r').split(" ")
             # print(temp)
-            if (auto.validate_postal_code(temp[0], keeper) and auto.validate_postal_code(temp[1], keeper) and (
+            if (automat.validate_postal_code(temp[0], keeper) and automat.validate_postal_code(temp[1], keeper) and (
             temp[2]).isdigit()):
                 print("origin: " + temp[0] + "\tDestination: " + temp[1] + "\tWeight: " + temp[2])
                 d = Delivery(temp[0], temp[1], temp[2])
                 self.request_queue.put(d)
             else:
                 print("A request did not meet standards:")
-                if (not auto.validate_postal_code(temp[0], keeper)):
+                if (not automat.validate_postal_code(temp[0], keeper)):
                     print("\t" + temp[0] + " is not a valid postal code")
-                if (not auto.validate_postal_code(temp[1], keeper)):
+                if (not automat.validate_postal_code(temp[1], keeper)):
                     print("\t" + temp[1] + " is not a valid postal code")
                 if (not temp[2].isdigit()):
                     print("\t" + temp[2] + " is not a valid weight")
@@ -67,7 +67,7 @@ class DeliveryRequest:
             self.priority_queue.put(temp_queue.get())
 
         print("fleet equilibration")
-        fleet.reequilibrate_fleet(auto)
+        fleet.reequilibrate_fleet(automat)
 
         # fleet.summarize_fleet_stats()
 

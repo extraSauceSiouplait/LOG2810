@@ -24,8 +24,7 @@ class Drone:
         if d.origin != self.current_location:
             # print("Not at correct starting location")
             return False
-        if len(
-                self.deliveries) == 0 and self.destination != self.current_location and d.destination != self.destination:
+        if len(self.deliveries) == 0 and self.destination != self.current_location and d.destination != self.destination:
             # print("This drone is already assigned to go somewhere")
             return False
         if len(self.deliveries) > 0 and d.destination != self.deliveries[0].destination:
