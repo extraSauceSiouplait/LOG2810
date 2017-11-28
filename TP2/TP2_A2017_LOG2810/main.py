@@ -30,38 +30,46 @@ fleet.reequilibrate_fleet(dave)
 fleet.deliver_packages(history)
 
 
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
 #Step6: Create DeliveryRequest object to handle requests
 requests = DeliveryRequest()
 
 #Step7: Process request
 requests.traiter_les_requetes("requetes1.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+
+
+
 
 #Step8: (repeat)
 requests.traiter_les_requetes("requetes2.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
 requests.traiter_les_requetes("requetes3.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
 requests.traiter_les_requetes("requetes4.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 requests.traiter_les_requetes("requetes5.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 requests.traiter_les_requetes("requetes6.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 requests.traiter_les_requetes("requetes7.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 requests.traiter_les_requetes("requetes8.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
-#for x in range(0,10):
-   # requests.traiter_les_requetes("r0.txt",dave,fleet,history)
-print("successful deliveries: " + str(history.n_successful_deliveries))
+#print("successful deliveries: " + str(history.n_successful_deliveries))
 
-print("\n\nAverage " + str(history.getDroneAverageDelivery(1000, fleet)) + "\n\n")
-print("\n\nAverage " + str(history.getDroneAverageDelivery(5000, fleet)) + "\n\n")
+while( not requests.request_queue.empty()):
+    print(requests.request_queue.get()),
+"""
+for x in range(0,10):
+    requests.traiter_les_requetes("r0.txt",dave,fleet,history)
+#print("successful deliveries: " + str(history.n_successful_deliveries))
+"""
+
+print("\n\nAverage " + str(history.get_average_n_packages_per_delivery(1000)) + "\n\n")
+print("\n\nAverage " + str(history.get_average_n_packages_per_delivery(5000)) + "\n\n")
 history.imprimerLesStatistiques()
 
 fleet.summarize_fleet_stats()
