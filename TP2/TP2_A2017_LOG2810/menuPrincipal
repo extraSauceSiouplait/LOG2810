@@ -1,0 +1,79 @@
+import random
+from delivery import *
+from codes_postaux_process import *
+
+
+choixMenu = ''
+automatecree = False
+requests = DeliveryRequest()
+automate = PostalCodeAutomaton()
+history = RecordKeeper()
+
+print("Bienvenue dans le menu principal du TP2 d'Alex, Marc-Andre et Mathieu!\n"
+      "A quelle fonctionnalite souhaitez-vous acceder? (a,b,c ou d)\n")
+
+while choixMenu != 'd':
+    choixMenu = raw_input("(a) Creer l'automate\n"
+                          "(b) Traiter des requetes\n"
+                          "(c) Afficher les statistiques\n"
+                          "(d) Quitter\n")
+
+    if choixMenu == 'a' and automatecree == False:
+        try:
+            automate.creer_arbre_addresses("CodesPostaux.txt")
+
+            fleet = DroneFleet("H1W1B2")
+            types = [[5000, 5], [1000, 10]]
+            fleet.add_drone_type(5000)
+            fleet.add_drone_type(1000)
+            fleet.add_n_drones(types[0][0], types[0][1])
+            fleet.add_n_drones(types[1][0], types[1][1])
+
+            fleet.reequilibrate_fleet(automate)
+            fleet.deliver_packages(history)
+
+            print("L'automate a ete cree avec succes\n")
+
+            automatecree = True
+
+        except:
+            print("La creation de l'automate a echoue, verifier si le\n"
+                  "fichier \"CodesPostaux\" est bien present dans le dossier\n")
+
+    elif choixMenu == 'a' and automatecree == True:
+        choix = raw_input("L'automate a deja ete cree, voulez-vous le mettre a jour? (o/n)")
+        if choix == 'o':
+            try:
+                nomFichier = raw_input("Entrer le nom du fichier contenant les codes postaux valides:  ")
+                automate.creer_arbre_addresses(nomFichier)
+                print("Automate mise a jour\n")
+
+            except:
+                print("Fichier introuvable ou incompatible\n")
+        else:
+            print("Retour au menu principal\n")
+
+    elif choixMenu == 'b'  and automatecree == False:
+        print("Veuillez creer l'automate avant de traiter des requetes\n")
+
+    elif choixMenu == 'b' and automatecree == True:
+
+        choixRequete = raw_input("Entrer le nom du fichier contenant la requete: ")
+
+        try:
+            requests.traiter_les_requetes(choixRequete, automate, fleet, history)
+
+        except:
+            print("Fichier introuvable ou incompatible\n")
+
+    elif choixMenu == 'c'and automatecree == False:
+        print("Veuillez creer l'automate avant d'afficher les statistiques\n")
+
+    elif choixMenu == 'c' and automatecree == True:
+        print("\nAverage " + str(history.getDroneAverageDelivery(1000, fleet)) + "\n\n")
+        print("\nAverage " + str(history.getDroneAverageDelivery(5000, fleet)) + "\n\n")
+        history.imprimerLesStatistiques()
+        print("\n")
+
+
+print("****** Fin du programme. Au revoir! ******")
