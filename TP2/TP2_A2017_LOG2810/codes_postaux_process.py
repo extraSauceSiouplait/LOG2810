@@ -37,59 +37,41 @@ class PostalCodeAutomaton:
         """
         current_state = self.possible_states[0]
         code = list(postal_code)
+
         while current_state != self.possible_states[6]:
 
             if current_state == self.possible_states[0]:
-
                 if not code[0] in self.recognized_postal_codes:
-                    # print(str(code[0]) + "not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[1]
 
             if current_state == self.possible_states[1]:
                 if not code[1] in self.recognized_postal_codes[code[0]]:
-                    # print(str(code[1]) + "not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[2]
 
             if current_state == self.possible_states[2]:
-
                 if not code[2] in self.recognized_postal_codes[code[0]][code[1]]:
-                    # print(str(code[2]) + "not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[3]
 
             if current_state == self.possible_states[3]:
-
                 if not code[3] in self.recognized_postal_codes[code[0]][code[1]][code[2]]:
-                    # print(str(code[3]) + "not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[4]
 
             if current_state == self.possible_states[4]:
-
                 if not code[4] in self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]]:
-                    # print(str(code[4]) + "not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[5]
 
             if current_state == self.possible_states[5]:
-
                 if not code[5] in self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]][code[4]]:
-                    # print(code[5])
-                    # print(self.recognized_postal_codes[code[0]][code[1]][code[2]][code[3]][code[4]])
-                    # print("last char not in dictionnary")
-                    keeper.add_invalid_request()
                     return False
                 else:
                     current_state = self.possible_states[6]
@@ -101,8 +83,8 @@ class PostalCodeAutomaton:
 
         :param filename: le fichier.txt d'ou importer les codes postaux
         """
-        self.recognized_postal_codes = {}
         data = open("./" + filename, "r")
+        self.recognized_postal_codes = {}
 
         for line in data:
             temp = line.strip('\n').strip('\r').strip(' ')
@@ -131,5 +113,4 @@ class PostalCodeAutomaton:
                 self.recognized_postal_codes[word[0]][word[1]][word[2]][word[3]][word[4]][word[5]] = temp
                 self.unorganized_postal_codes.append(temp)
 
-
-                # return (True)
+        data.close()

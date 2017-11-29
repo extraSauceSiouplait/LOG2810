@@ -51,17 +51,24 @@ requests.traiter_les_requetes("requetes3.txt",dave,fleet,history)
 
 requests.traiter_les_requetes("requetes4.txt",dave,fleet,history)
 #print("successful deliveries: " + str(history.n_successful_deliveries))
+
 requests.traiter_les_requetes("requetes5.txt",dave,fleet,history)
 #print("successful deliveries: " + str(history.n_successful_deliveries))
+
 requests.traiter_les_requetes("requetes6.txt",dave,fleet,history)
 #print("successful deliveries: " + str(history.n_successful_deliveries))
+
 requests.traiter_les_requetes("requetes7.txt",dave,fleet,history)
 #print("successful deliveries: " + str(history.n_successful_deliveries))
+
+
 requests.traiter_les_requetes("requetes8.txt",dave,fleet,history)
 #print("successful deliveries: " + str(history.n_successful_deliveries))
 
+"""
 while( not requests.request_queue.empty()):
-    print(requests.request_queue.get()),
+    print(requests.request_queue.get().weight),
+"""
 """
 for x in range(0,10):
     requests.traiter_les_requetes("r0.txt",dave,fleet,history)
@@ -70,6 +77,12 @@ for x in range(0,10):
 
 print("\n\nAverage " + str(history.get_average_n_packages_per_delivery(1000)) + "\n\n")
 print("\n\nAverage " + str(history.get_average_n_packages_per_delivery(5000)) + "\n\n")
-history.imprimerLesStatistiques()
+history.imprimer_statistiques()
+
+print("Commande")
+print(requests.request_queue.empty())
+while( not requests.request_queue.empty()):
+
+    print(requests.request_queue.get().weight),
 
 fleet.summarize_fleet_stats()

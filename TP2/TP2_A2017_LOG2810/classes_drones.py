@@ -11,7 +11,7 @@ class Drone:
         self.remaining_capacity = max_load
         self.maximum_load = max_load
 
-    def getDroneType(self):
+    def get_drone_type(self):
         return self.maximum_load
 
     def update_weight(self):
@@ -22,24 +22,35 @@ class Drone:
             self.remaining_capacity -= d.weight
 
     def delivery_is_possible(self, delivery):
+
+        """
+        :param delivery: un objet Delivery
+        :rtype: bool
+        """
         if delivery.weight > self.remaining_capacity:
-            # print("too much weight: Max="+str(self.remaining_capacity)+" weight="+str(d.weight))
             return False
+
         if delivery.origin != self.current_location:
-            # print("Not at correct starting location")
             return False
+
         if len(self.deliveries) == 0 and self.destination != self.current_location and delivery.destination != self.destination:
-            # print("This drone is already assigned to go somewhere")
             return False
+
         if len(self.deliveries) > 0 and delivery.destination != self.deliveries[0].destination:
-            # print("Not going to the same place")
             return False
+
         return True
 
     def add_package(self, delivery):
+
+        """
+
+        :param delivery: Objet Delivery
+        :return:
+        """
         if not self.delivery_is_possible(delivery):
-            # print(str(self.remaining_capacity)+"\tCannot add package to this drone")
             return False
+
         else:
             self.deliveries.append(delivery)
             self.update_weight()
@@ -56,20 +67,28 @@ class Drone:
         else:
             return True
 
-    #def deploy_to(self, location):
+
     def deploy_to(self, delivery):
+        """
+
+        :param delivery: Objet Delivery
+        """
         self.urgent_deliveries.append(delivery)
         self.destination = delivery.origin
 
     def deliver(self, keeper):
+        """
+
+        :param keeper: Objet RecordKeeper responsable des statistiques de livraison
+        :return:
+        """
         if self.current_location != self.destination or len(self.deliveries) > 0:
 
             if self.current_location != self.destination and len(self.deliveries) > 0:
-                keeper.add_successful_delivery(self.getDroneType(), len(self.deliveries))
-                #keeper.add_successful_delivery(self.maximum_load, len(self.deliveries))
+                keeper.add_successful_delivery(self.get_drone_type(), len(self.deliveries))
 
             self.current_location = self.destination
-            self.urgent_deliveries = []
+            self.urgent_deliveries.clear()
 
             if len(self.deliveries) > 0:
                 d = self.deliveries[0]
@@ -94,6 +113,10 @@ class Drone:
         print("Destination: " + self.destination)
 
     def has_room(self, delivery):
+        """
+        :param delivery: Objet Delivery
+        :rtype: booléen indiquant si le drone peut porter ce paquet supplémentaire
+        """
         weight_of_next_shipment = delivery.weight
         for d in self.urgent_deliveries:
             weight_of_next_shipment += d.weight
@@ -108,15 +131,38 @@ class DroneFleet:
         self.types = {}
         self.home = starting_location
 
+    def reset_all(self, starting_location):
+        """
+
+        :param starting_location: Le lieu d'initialisation des drones
+        """
+        self.units.clear()
+        self.types.clear()
+        self.home = starting_location
+
     def add_drone_type(self, weight_limit_in_grams):
+        """
+
+        :param weight_limit_in_grams: le type de drone
+        """
         self.types[weight_limit_in_grams] = 0
 
     def add_n_drones(self, weight_limit_in_grams, n_drones):
+        """
+
+        :param weight_limit_in_grams: le type de drone
+        :param n_drones: nombre de drone à ajouter
+        """
         self.types[weight_limit_in_grams] = self.types[weight_limit_in_grams] + n_drones
         for x in range(n_drones):
             self.units.append(Drone(self.home, weight_limit_in_grams))
 
     def n_drones_available(self, weight_limit_in_grams):
+        """
+
+        :param weight_limit_in_grams: le type de drone
+        :return: le nombre de drone sans taches
+        """
         count = 0
         for drone in self.units:
             if drone.remaining_capacity == weight_limit_in_grams:
@@ -139,61 +185,71 @@ class DroneFleet:
         print("______________________________________________________________________________________")
 
     def assign_delivery_to_drone(self, delivery):
+        """
+
+        :param delivery: Objet Delivery
+        :return: Booléen indiquant si la delivery a été assignée
+        """
         key_list = self.types.keys()
 
         for model in sorted(key_list):
-            for unit in self.units:
-                if unit.maximum_load == model:
-                    # print("Load size = " + str(d.weight) + "\tMax load: " + str(model))
-                    if unit.add_package(delivery):
+            for drone in self.units:
+                if drone.maximum_load == model:
+                    if drone.add_package(delivery):
                         return True
         return False
 
-    def send_a_drone_to(self, d):
+    def send_a_drone_to(self, delivery):
         # get list of all drone types
+        """
+
+        :param delivery: Objet Delivery
+        :return: Bool indiquant si aucun drone n'est disponible
+        """
         key_list = self.types.keys()
 
         # put them in numerical order
         for model in sorted(key_list):
-            # print("now looking at model #" + str(model))
-            for unit in self.units:
-                if unit.maximum_load == model:
-                    if unit.has_room(d):
-                    #if unit.drone_is_available():
-                        #if d.weight <= unit.remaining_capacity:
-                            # unit.remaining_capacity -= d.weight
-                            #unit.deploy_to(d.origin)
-                            unit.deploy_to(d)
+            for drone in self.units:
+                if drone.maximum_load == model:
+                    if drone.has_room(delivery):
+                            drone.deploy_to(delivery)
                             return True
         return False
 
     def deliver_packages(self, keeper):
+        """
+
+        :param keeper: Objet RecordKeeper responsable des statistiques de livraison
+        """
         for unit in self.units:
             unit.deliver(keeper)
 
     def reequilibrate_fleet(self, automat):
+
         # 1) List all postal codes
-        # print("beginning postal_codes")
+        """
+
+        :param automat: Automate validant les codes postaux des dépots
+        """
         list_of_postal_codes = list(automat.unorganized_postal_codes)
-        # print(list_of_postal_codes)
-        # print(list_of_postal_codes)
+
         # 2) For each non-available drone
         for unit in self.units:
-            # print(str(unit.maximum_load) +"\t" + str(unit.drone_is_available()))
+
             if not unit.drone_is_available():
                 if unit.destination in list_of_postal_codes:
                     # 3) subtract their destination from the list of postal codes
-                    # print(unit.destination)
+                    # 3) subtract their destination from the list of postal codes
                     list_of_postal_codes.remove(unit.destination)
-        # print(list_of_postal_codes)
+
         # 4) Dispatch them to different locations selected at random
         for unit in self.units:
             if unit.drone_is_available():
-                # print(list_of_postal_codes)
-                # print("remaining Postal codes:")
-                # print(list_of_postal_codes)
+                if len(list_of_postal_codes) == 0:
+                    list_of_postal_codes = list(automat.unorganized_postal_codes)
+
                 d = random.sample(list_of_postal_codes, 1)[0]
-                # print(d)
                 unit.destination = d
                 list_of_postal_codes.remove(d)
-                # print("deploying unit to " + d)
+
